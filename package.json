@@ -22,7 +22,6 @@
   "dependencies": {
     "lit": "^2.7.0"
   },
-{
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
