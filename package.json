@@ -22,6 +22,7 @@
   "dependencies": {
     "lit": "^2.7.0"
   },
+{
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
@@ -31,6 +32,10 @@
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
     "eslint": "^8.38.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1",
     "rollup": "^3.20.2",
     "rollup-plugin-serve": "^2.0.2"
   }
