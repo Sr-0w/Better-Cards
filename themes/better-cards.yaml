@@ -1,0 +1,22 @@
+better-cards:
+  # Card Variables
+  better-card-border-radius: "16px"
+  better-card-box-shadow: "0 2px 4px 0 rgba(0,0,0,0.16)"
+  
+  # Switch Card Variables
+  better-switch-on-bg: "#FFFFFF"
+  better-switch-off-bg: "#1C1C1E"
+  better-switch-on-text: "#000000"
+  better-switch-off-text: "#FFFFFF"
+  better-switch-icon-on-bg: "#1C1C1E"
+  better-switch-icon-off-bg: "#FFFFFF"
+  better-switch-icon-on-color: "#FFFFFF"
+  better-switch-icon-off-color: "#000000"
+  
+  # Base theme overrides
+  primary-text-color: "var(--better-switch-off-text)"
+  ha-card-background: "var(--better-switch-off-bg)"
+  light-primary-color: "var(--better-switch-on-bg)"
+  paper-item-icon-color: "var(--better-switch-icon-off-color)"
+  ha-card-border-radius: "var(--better-card-border-radius)"
+  ha-card-box-shadow: "var(--better-card-box-shadow)"  x
