@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: write
-  issues: write
-  pull-requests: write
 
 jobs:
   build-and-release:
@@ -29,11 +27,13 @@ jobs:
       - name: Build
         run: npm run build
         
+      - name: List dist directory
+        run: ls -la dist/
+        
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            dist/smart-light-card.js
+          files: dist/better-cards.js
           generate_release_notes: true
           draft: false
           prerelease: false
