@@ -1,9 +1,9 @@
 {
-  "name": "smart-light-card",
+  "name": "better-cards",
   "version": "1.0.0",
-  "description": "A stylish light control card for Home Assistant",
+  "description": "A collection of better cards for Home Assistant",
   "type": "module",
-  "main": "dist/smart-light-card.js",
+  "main": "dist/better-cards.js",
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint src/**/*.js",
@@ -15,8 +15,7 @@
     "hass",
     "automation",
     "lovelace",
-    "custom-cards",
-    "light"
+    "custom-cards"
   ],
   "author": "Your Name",
   "license": "MIT",
