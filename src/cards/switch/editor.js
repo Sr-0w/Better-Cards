@@ -1,11 +1,43 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, nothing } from 'lit';
 import { DEFAULT_CONFIG } from './const';
+
+// Form schema definition
+const SCHEMA = [
+  {
+    name: "entity",
+    selector: {
+      entity: {
+        domain: ["switch", "light", "input_boolean"]
+      }
+    }
+  },
+  {
+    name: "name",
+    selector: { text: {} }
+  },
+  {
+    name: "icon",
+    selector: { icon: {} }
+  },
+  {
+    name: "animation_duration",
+    selector: {
+      number: {
+        min: 0,
+        max: 5000,
+        step: 100,
+        unit_of_measurement: "ms",
+        mode: "box"
+      }
+    }
+  }
+];
 
 export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
     return {
       hass: { type: Object },
-      config: { type: Object },
+      _config: { type: Object },
     };
   }
 
@@ -13,94 +45,60 @@ export class BetterSwitchCardEditor extends LitElement {
     this._config = { ...DEFAULT_CONFIG, ...config };
   }
 
-  // This prevents a card-editor background
-  static get styles() {
-    return '';
+  connectedCallback() {
+    super.connectedCallback();
+    this._loadComponents();
   }
 
-  async firstUpdated() {
-    // Load card-tools for better editor support
-    await this.loadCardHelpers();
+  async _loadComponents() {
+    await Promise.all([
+      customElements.whenDefined("ha-form"),
+      customElements.whenDefined("ha-entity-picker"),
+    ]);
   }
 
-  async loadCardHelpers() {
-    this._helpers = await window.loadCardHelpers();
+  _computeLabel(schema) {
+    switch (schema.name) {
+      case "entity":
+        return "Entity (Required)";
+      case "name":
+        return "Name (Optional)";
+      case "icon":
+        return "Icon (Optional)";
+      case "animation_duration":
+        return "Animation Duration";
+      default:
+        return schema.name;
+    }
   }
 
   render() {
     if (!this.hass || !this._config) {
-      return html``;
+      return nothing;
     }
 
     return html`
-      <div class="card-config">
-        <div class="side-by-side">
-          <paper-input
-            label="Entity (Required)"
-            .value="${this._config.entity}"
-            .configValue="entity"
-            @value-changed="${this._valueChanged}"
-          ></paper-input>
-        </div>
-        <div class="side-by-side">
-          <paper-input
-            label="Name (Optional)"
-            .value="${this._config.name || ''}"
-            .configValue="name"
-            @value-changed="${this._valueChanged}"
-          ></paper-input>
-        </div>
-        <div class="side-by-side">
-          <paper-input
-            label="Icon (Optional)"
-            .value="${this._config.icon || ''}"
-            .configValue="icon"
-            @value-changed="${this._valueChanged}"
-          ></paper-input>
-        </div>
-        <div class="side-by-side">
-          <paper-input
-            label="Animation Duration (ms)"
-            type="number"
-            .value="${this._config.animation_duration || 500}"
-            .configValue="animation_duration"
-            @value-changed="${this._valueChanged}"
-          ></paper-input>
-        </div>
-      </div>
+      <ha-form
+        .hass=${this.hass}
+        .data=${this._config}
+        .schema=${SCHEMA}
+        .computeLabel=${this._computeLabel}
+        @value-changed=${this._valueChanged}
+      ></ha-form>
     `;
   }
 
   _valueChanged(ev) {
-    if (!this._config || !this.hass) return;
-
-    const target = ev.target;
-    const value = target.value || '';
-    
-    if (this[`_${target.configValue}`] === value) return;
-
-    let newConfig;
-    if (target.configValue) {
-      if (target.type === 'number') {
-        newConfig = { 
-          ...this._config,
-          [target.configValue]: parseInt(value) || 500
-        };
-      } else {
-        newConfig = {
-          ...this._config,
-          [target.configValue]: value
-        };
-      }
-    }
-
-    const event = new CustomEvent('config-changed', {
-      detail: { config: newConfig },
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(event);
+    const config = ev.detail.value;
+    this._config = config;
+    this.dispatchEvent(
+      new CustomEvent("config-changed", {
+        detail: { config },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 }
 
-customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
+customElements.define("better-switch-card-editor", BetterSwitchCardEditor);
