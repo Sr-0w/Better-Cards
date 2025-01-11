@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { DEFAULT_CONFIG, CARD_VERSION, CARD_NAME } from './const';
 import { styles } from './styles';
 import './editor';
-import { log, throwError } from '../../shared/utils';
+import { log } from '../../shared/utils';
 
 log.info(
   `%c ${CARD_NAME} %c ${CARD_VERSION} `,
@@ -40,13 +40,22 @@ class BetterSwitchCard extends LitElement {
 
   setConfig(config) {
     if (!config.entity) {
-      throwError("Please define an entity");
+      throw new Error("Please define an entity");
     }
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
-  getCardSize() {
-    return 3;
+  _toggle(e) {
+    e.stopPropagation();
+    const stateObj = this.hass.states[this.config.entity];
+    if (!stateObj) return;
+
+    const service = stateObj.state === 'on' ? 'turn_off' : 'turn_on';
+    const [domain] = this.config.entity.split('.');
+    
+    this.hass.callService(domain, service, {
+      entity_id: this.config.entity,
+    });
   }
 
   render() {
@@ -67,61 +76,25 @@ class BetterSwitchCard extends LitElement {
 
     const isOn = stateObj.state === 'on';
     const name = this.config.name || stateObj.attributes.friendly_name;
+    const icon = this.config.icon || 
+                (isOn ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off');
 
     return html`
-      <ha-card>
-        <button 
-          class="toggle-button ${isOn ? 'on' : 'off'}"
-          @click="${this._toggle}"
-          style="--animation-duration: ${this.config.animation_duration}ms"
-        >
+      <ha-card @click="${this._toggle}">
+        <div class="toggle-button ${isOn ? 'on' : 'off'}">
           <div class="toggle-text">
             <span class="room-name">${name}</span>
             <span class="status">${isOn ? 'On' : 'Off'}</span>
           </div>
-          
           <div class="icon-container">
-            <ha-icon
-              .icon=${isOn ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}
-            ></ha-icon>
+            <ha-icon .icon=${icon}></ha-icon>
           </div>
-          
-          ${this.config.show_slider ? html`
-            <div class="switch-slider">
-              <ha-slider
-                .min=${0}
-                .max=${100}
-                .value=${isOn ? 100 : 0}
-                @change=${this._handleSlider}
-              ></ha-slider>
-            </div>
-          ` : ''}
-        </button>
+        </div>
       </ha-card>
     `;
-  }
-
-  _toggle(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const service = this.hass.states[this.config.entity].state === 'on' ? 'turn_off' : 'turn_on';
-    
-    this.hass.callService('switch', service, {
-      entity_id: this.config.entity,
-    });
-  }
-
-  _handleSlider(e) {
-    e.stopPropagation();
-    
-    const value = e.target.value;
-    const service = value > 0 ? 'turn_on' : 'turn_off';
-    
-    this.hass.callService('switch', service, {
-      entity_id: this.config.entity
-    });
   }
 }
 
 customElements.define('better-switch-card', BetterSwitchCard);
+
+export default BetterSwitchCard;
