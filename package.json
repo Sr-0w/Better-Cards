@@ -2,6 +2,7 @@
   "name": "smart-light-card",
   "version": "1.0.0",
   "description": "A stylish light control card for Home Assistant",
+  "type": "module",
   "main": "dist/smart-light-card.js",
   "scripts": {
     "build": "rollup -c",
