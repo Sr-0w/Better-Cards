@@ -8,25 +8,25 @@ export const styles = css`
   .toggle-button {
     width: 100%;
     height: 128px;
-    border-radius: 16px;
+    border-radius: var(--ha-card-border-radius, 16px);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 24px;
     transition: all var(--animation-duration, 500ms) ease-in-out;
-    box-shadow: var(--ha-card-box-shadow, 0 2px 2px 0 rgba(0, 0, 0, 0.14));
+    box-shadow: var(--ha-card-box-shadow, 0 2px 4px 0 rgba(0,0,0,0.14));
     border: none;
     cursor: pointer;
     position: relative;
     overflow: hidden;
   }
   .toggle-button.off {
-    background-color: var(--ha-card-background, var(--card-background-color, black));
+    background-color: var(--ha-card-background, black);
     color: var(--primary-text-color, white);
   }
   .toggle-button.on {
-    background-color: var(--light-primary-color, white);
-    color: var(--primary-text-color, black);
+    background-color: var(--primary-color, white);
+    color: var(--text-primary-color, black);
   }
   .toggle-text {
     display: flex;
@@ -54,14 +54,14 @@ export const styles = css`
     z-index: 1;
   }
   .off .icon-container {
-    background-color: var(--light-primary-color, white);
-    color: var(--primary-text-color, black);
+    background-color: var(--primary-color, white);
+    color: var(--ha-card-background, black);
   }
   .on .icon-container {
     background-color: var(--ha-card-background, black);
-    color: var(--light-primary-color, white);
+    color: var(--primary-color, white);
   }
-  .brightness-slider {
+  .switch-slider {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -71,7 +71,13 @@ export const styles = css`
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
   }
-  .toggle-button:hover .brightness-slider {
+  .toggle-button:hover .switch-slider {
     opacity: 1;
+  }
+  
+  .warning {
+    display: block;
+    color: var(--error-color);
+    padding: 8px;
   }
 `;
