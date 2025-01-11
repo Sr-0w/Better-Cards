@@ -45,16 +45,8 @@ class BetterSwitchCard extends LitElement {
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
-  _handleAction(e) {
-    const stateObj = this.hass.states[this.config.entity];
-    if (!stateObj) return;
-    
-    const service = stateObj.state === 'on' ? 'turn_off' : 'turn_on';
-    const [domain] = this.config.entity.split('.');
-    
-    this.hass.callService(domain, service, {
-      entity_id: this.config.entity,
-    });
+  getCardSize() {
+    return 3;
   }
 
   render() {
@@ -75,13 +67,12 @@ class BetterSwitchCard extends LitElement {
 
     const isOn = stateObj.state === 'on';
     const name = this.config.name || stateObj.attributes.friendly_name;
-    const icon = this.config.icon || 
-                (isOn ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off');
 
     return html`
-      <ha-card @click="${this._handleAction}">
-        <div 
+      <ha-card>
+        <button 
           class="toggle-button ${isOn ? 'on' : 'off'}"
+          @click="${this._toggle}"
           style="--animation-duration: ${this.config.animation_duration}ms"
         >
           <div class="toggle-text">
@@ -90,11 +81,46 @@ class BetterSwitchCard extends LitElement {
           </div>
           
           <div class="icon-container">
-            <ha-icon .icon=${icon}></ha-icon>
+            <ha-icon
+              .icon=${isOn ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}
+            ></ha-icon>
           </div>
-        </div>
+          
+          ${this.config.show_slider ? html`
+            <div class="switch-slider">
+              <ha-slider
+                .min=${0}
+                .max=${100}
+                .value=${isOn ? 100 : 0}
+                @change=${this._handleSlider}
+              ></ha-slider>
+            </div>
+          ` : ''}
+        </button>
       </ha-card>
     `;
+  }
+
+  _toggle(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const service = this.hass.states[this.config.entity].state === 'on' ? 'turn_off' : 'turn_on';
+    
+    this.hass.callService('switch', service, {
+      entity_id: this.config.entity,
+    });
+  }
+
+  _handleSlider(e) {
+    e.stopPropagation();
+    
+    const value = e.target.value;
+    const service = value > 0 ? 'turn_on' : 'turn_off';
+    
+    this.hass.callService('switch', service, {
+      entity_id: this.config.entity
+    });
   }
 }
 
