@@ -20,18 +20,21 @@ export const styles = css`
     padding: 16px;
     transition: all var(--animation-duration, 500ms) ease-in-out;
     border: none;
+    border-radius: var(--ha-card-border-radius, 12px);
     cursor: pointer;
+    margin: 0;
     background: var(--ha-card-background, #1c1c1e);
+    color: var(--primary-text-color, white);
   }
 
   .toggle-button.off {
     background-color: var(--ha-card-background, #1c1c1e);
-    color: var(--primary-text-color, #FFF);
+    color: var(--primary-text-color, white);
   }
 
   .toggle-button.on {
-    background-color: var(--primary-color);
-    color: var(--primary-text-color);
+    background-color: white;
+    color: black;
   }
 
   .toggle-text {
@@ -62,13 +65,13 @@ export const styles = css`
   }
 
   .off .icon-container {
-    background-color: var(--primary-text-color, #FFF);
+    background-color: white;
     color: var(--ha-card-background, #1c1c1e);
   }
 
   .on .icon-container {
-    background-color: var(--primary-text-color);
-    color: var(--primary-color);
+    background-color: var(--ha-card-background, #1c1c1e);
+    color: white;
   }
 
   .warning {
