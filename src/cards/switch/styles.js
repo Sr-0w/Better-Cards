@@ -3,49 +3,58 @@ import { css } from 'lit';
 export const styles = css`
   :host {
     display: block;
-    padding: 16px;
   }
+  
+  ha-card {
+    height: 100%;
+  }
+
   .toggle-button {
     width: 100%;
-    height: 128px;
-    border-radius: var(--ha-card-border-radius, 16px);
+    height: 100%;
+    min-height: 128px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px;
+    padding: 16px;
     transition: all var(--animation-duration, 500ms) ease-in-out;
-    box-shadow: var(--ha-card-box-shadow, 0 2px 4px 0 rgba(0,0,0,0.14));
     border: none;
     cursor: pointer;
     position: relative;
     overflow: hidden;
   }
+
   .toggle-button.off {
     background-color: var(--ha-card-background, black);
     color: var(--primary-text-color, white);
   }
+
   .toggle-button.on {
     background-color: var(--primary-color, white);
     color: var(--text-primary-color, black);
   }
+
   .toggle-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     z-index: 1;
   }
+
   .room-name {
-    font-size: 18px;
+    font-size: 1.2rem;
     font-weight: 500;
     margin-bottom: 4px;
   }
+
   .status {
-    font-size: 14px;
+    font-size: 0.9rem;
     opacity: 0.7;
   }
+
   .icon-container {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -53,31 +62,24 @@ export const styles = css`
     transition: all var(--animation-duration, 500ms);
     z-index: 1;
   }
+
   .off .icon-container {
     background-color: var(--primary-color, white);
     color: var(--ha-card-background, black);
   }
+
   .on .icon-container {
     background-color: var(--ha-card-background, black);
     color: var(--primary-color, white);
   }
-  .switch-slider {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 8px 24px;
-    box-sizing: border-box;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-  }
-  .toggle-button:hover .switch-slider {
-    opacity: 1;
-  }
-  
+
   .warning {
     display: block;
     color: var(--error-color);
-    padding: 8px;
+    padding: 16px;
+  }
+
+  ha-icon {
+    --mdc-icon-size: 24px;
   }
 `;
