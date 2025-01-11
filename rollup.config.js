@@ -18,10 +18,11 @@ const serveOpts = {
 };
 
 export default {
-  input: 'src/smart-light-card.js',
+  input: 'src/index.js',
   output: {
     dir: 'dist',
     format: 'es',
+    filename: 'better-cards.js'
   },
   plugins: [
     nodeResolve(),
