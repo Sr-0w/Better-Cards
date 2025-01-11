@@ -4,6 +4,6 @@ export const CARD_NAME = 'Better Switch Card';
 export const DEFAULT_CONFIG = {
   entity: '',
   name: '',
-  show_slider: false,
+  icon: '',
   animation_duration: 500,
 };
