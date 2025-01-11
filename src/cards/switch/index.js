@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { DEFAULT_CONFIG, CARD_VERSION, CARD_NAME } from './const';
 import { styles } from './styles';
-import { BetterSwitchCardEditor } from './editor';
+import './editor';  // Just import the file, don't try to get the class
 import { log, throwError } from '../../shared/utils';
 
 log.info(
@@ -124,6 +124,3 @@ class BetterSwitchCard extends LitElement {
 }
 
 customElements.define('better-switch-card', BetterSwitchCard);
-customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
-
-export default BetterSwitchCard;
