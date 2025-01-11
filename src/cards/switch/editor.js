@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { DEFAULT_CONFIG } from './const';
 
-export class SmartLightCardEditor extends LitElement {
+export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
     return {
       hass: { type: Object },
@@ -24,9 +24,9 @@ export class SmartLightCardEditor extends LitElement {
           .hass="${this.hass}"
           .value="${this._config.entity}"
           .configValue="entity"
-          .includeDomains='["light"]'
+          .includeDomains='["switch"]'
           @value-changed="${this._valueChanged}"
-          label="Entity (Required)"
+          label="Switch Entity (Required)"
         ></ha-entity-picker>
         
         <paper-input
@@ -36,10 +36,10 @@ export class SmartLightCardEditor extends LitElement {
           @value-changed="${this._valueChanged}"
         ></paper-input>
         
-        <ha-formfield label="Show Brightness Slider">
+        <ha-formfield label="Show Slider">
           <ha-switch
-            .checked=${this._config.show_brightness}
-            .configValue="show_brightness"
+            .checked=${this._config.show_slider}
+            .configValue="show_slider"
             @change="${this._valueChanged}"
           ></ha-switch>
         </ha-formfield>
@@ -76,3 +76,5 @@ export class SmartLightCardEditor extends LitElement {
     this.dispatchEvent(event);
   }
 }
+
+customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
