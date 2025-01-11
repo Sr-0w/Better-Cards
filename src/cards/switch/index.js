@@ -30,14 +30,6 @@ class BetterSwitchCard extends LitElement {
     return styles;
   }
 
-  static async getConfigElement() {
-    return document.createElement("better-switch-card-editor");
-  }
-
-  static getStubConfig() {
-    return DEFAULT_CONFIG;
-  }
-
   setConfig(config) {
     if (!config.entity) {
       throw new Error("Please define an entity");
@@ -47,6 +39,8 @@ class BetterSwitchCard extends LitElement {
 
   _toggle(e) {
     e.stopPropagation();
+    e.preventDefault();
+    
     const stateObj = this.hass.states[this.config.entity];
     if (!stateObj) return;
 
@@ -80,8 +74,12 @@ class BetterSwitchCard extends LitElement {
                 (isOn ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off');
 
     return html`
-      <ha-card @click="${this._toggle}">
-        <div class="toggle-button ${isOn ? 'on' : 'off'}">
+      <ha-card>
+        <button 
+          class="toggle-button ${isOn ? 'on' : 'off'}"
+          @click="${this._toggle}"
+          type="button"
+        >
           <div class="toggle-text">
             <span class="room-name">${name}</span>
             <span class="status">${isOn ? 'On' : 'Off'}</span>
@@ -89,7 +87,7 @@ class BetterSwitchCard extends LitElement {
           <div class="icon-container">
             <ha-icon .icon=${icon}></ha-icon>
           </div>
-        </div>
+        </button>
       </ha-card>
     `;
   }
