@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { DEFAULT_CONFIG, CARD_VERSION, CARD_NAME } from './const';
 import { styles } from './styles';
-import './editor';  // Just import the file, don't try to get the class
+import './editor';
 import { log, throwError } from '../../shared/utils';
 
 log.info(
@@ -82,7 +82,7 @@ class BetterSwitchCard extends LitElement {
           
           <div class="icon-container">
             <ha-icon
-              .icon=${isOn ? 'mdi:white-balance-sunny' : 'mdi:moon-waning-crescent'}
+              .icon=${isOn ? 'mdi:toggle-switch' : 'mdi:toggle-switch-off'}
             ></ha-icon>
           </div>
           
@@ -106,6 +106,7 @@ class BetterSwitchCard extends LitElement {
     e.stopPropagation();
     
     const service = this.hass.states[this.config.entity].state === 'on' ? 'turn_off' : 'turn_on';
+    
     this.hass.callService('switch', service, {
       entity_id: this.config.entity,
     });
