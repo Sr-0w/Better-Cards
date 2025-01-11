@@ -80,15 +80,11 @@ class BetterSwitchCard extends LitElement {
 
     return html`
       <ha-card @click="${this._handleAction}">
-        <div 
-          class="toggle-button ${isOn ? 'on' : 'off'}"
-          style="--animation-duration: ${this.config.animation_duration}ms"
-        >
+        <div class="toggle-button ${isOn ? 'on' : 'off'}">
           <div class="toggle-text">
             <span class="room-name">${name}</span>
             <span class="status">${isOn ? 'On' : 'Off'}</span>
           </div>
-          
           <div class="icon-container">
             <ha-icon .icon=${icon}></ha-icon>
           </div>
@@ -99,3 +95,5 @@ class BetterSwitchCard extends LitElement {
 }
 
 customElements.define('better-switch-card', BetterSwitchCard);
+
+export default BetterSwitchCard;
