@@ -4,12 +4,14 @@ export const styles = css`
   :host {
     display: block;
   }
-  
+
   ha-card {
     height: 100%;
+    overflow: hidden;
   }
 
   .toggle-button {
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
     min-height: 128px;
@@ -20,8 +22,6 @@ export const styles = css`
     transition: all var(--animation-duration, 500ms) ease-in-out;
     border: none;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
   }
 
   .toggle-button.off {
@@ -38,7 +38,6 @@ export const styles = css`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    z-index: 1;
   }
 
   .room-name {
@@ -60,7 +59,6 @@ export const styles = css`
     align-items: center;
     justify-content: center;
     transition: all var(--animation-duration, 500ms);
-    z-index: 1;
   }
 
   .off .icon-container {
