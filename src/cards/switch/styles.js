@@ -5,30 +5,32 @@ export const styles = css`
     display: block;
     height: 100%;
     --internal-padding: 12px;
-    --icon-size: min(40px, calc(var(--grid-card-height, 1px) * 0.25));
-    --font-size-name: min(1.2rem, calc(var(--grid-card-height, 1px) * 0.15));
-    --font-size-status: min(0.9rem, calc(var(--grid-card-height, 1px) * 0.12));
+    --icon-size: min(40px, calc(var(--card-height, 100px) * 0.4));
+    --font-size-name: min(1.2rem, calc(var(--card-height, 100px) * 0.15));
+    --font-size-status: min(0.9rem, calc(var(--card-height, 100px) * 0.12));
   }
 
   ha-card {
     height: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
+    justify-content: center;
   }
 
   .toggle-button {
-    position: relative;
-    flex: 1;
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 100%;
     padding: var(--internal-padding);
-    box-sizing: border-box;
+    background: none;
     transition: all var(--animation-duration, 500ms) ease-in-out;
     border: none;
     cursor: pointer;
+    margin: 0;
+    box-sizing: border-box;
   }
 
   .toggle-button.off {
@@ -45,8 +47,9 @@ export const styles = css`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    min-width: 0;
     flex: 1;
+    min-width: 0;
+    padding-right: var(--internal-padding);
   }
 
   .room-name {
@@ -73,7 +76,6 @@ export const styles = css`
     align-items: center;
     justify-content: center;
     transition: all var(--animation-duration, 500ms);
-    margin-left: var(--internal-padding);
   }
 
   .off .icon-container {
@@ -86,13 +88,14 @@ export const styles = css`
     color: var(--primary-color, white);
   }
 
+  ha-icon {
+    --mdc-icon-size: calc(var(--icon-size) * 0.6);
+    display: flex;
+  }
+
   .warning {
     display: block;
     color: var(--error-color);
     padding: var(--internal-padding);
-  }
-
-  ha-icon {
-    --mdc-icon-size: calc(var(--icon-size) * 0.6);
   }
 `;
