@@ -1,4 +1,4 @@
-import { html, LitElement } from "lit";
+import { html, LitElement, css } from "lit";
 import { fireEvent } from "custom-card-helpers";
 import { DOMAINS } from "./const";
 
@@ -8,6 +8,26 @@ export class BetterSwitchCardEditor extends LitElement {
       hass: { type: Object },
       _config: { type: Object },
     };
+  }
+
+  static get styles() {
+    return css`
+      .card-config {
+        padding: 16px;
+      }
+      ha-textfield {
+        display: block;
+        margin: 8px 0;
+      }
+      ha-entity-picker {
+        display: block;
+        margin: 8px 0;
+      }
+      ha-icon-picker {
+        display: block;
+        margin: 8px 0;
+      }
+    `;
   }
 
   setConfig(config) {
@@ -100,12 +120,6 @@ export class BetterSwitchCardEditor extends LitElement {
         ></ha-textfield>
       </div>
     `;
-  }
-
-  static styles = {
-    card-config: {
-      padding: "16px"
-    }
   }
 }
 
