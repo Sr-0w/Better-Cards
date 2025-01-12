@@ -1,10 +1,10 @@
+// index.js
 import { LitElement, html } from 'lit';
 import { DEFAULT_CONFIG, CARD_VERSION, CARD_NAME } from './const';
 import { styles } from './styles';
 import './editor';
-import { log } from '../../shared/utils';
 
-log.info(
+console.info(
   `%c ${CARD_NAME} %c ${CARD_VERSION} `,
   'color: white; background: #555; font-weight: 700;',
   'color: white; background: #000; font-weight: 700;',
@@ -15,7 +15,7 @@ window.customCards.push({
   type: "better-switch-card",
   name: CARD_NAME,
   description: "A stylish switch card with animations",
-  preview: true,
+  preview: true
 });
 
 class BetterSwitchCard extends LitElement {
@@ -30,12 +30,18 @@ class BetterSwitchCard extends LitElement {
     return styles;
   }
 
-  static getConfigElement() {
+  static async getConfigElement() {
+    await import('./editor');
     return document.createElement("better-switch-card-editor");
   }
 
   static getStubConfig() {
-    return DEFAULT_CONFIG;
+    return {
+      entity: "",
+      name: "",
+      icon: "",
+      animation_duration: 500,
+    };
   }
 
   setConfig(config) {
@@ -87,6 +93,7 @@ class BetterSwitchCard extends LitElement {
           class="toggle-button ${isOn ? 'on' : 'off'}"
           @click="${this._toggle}"
           type="button"
+          style="--animation-duration: ${this.config.animation_duration}ms"
         >
           <div class="toggle-text">
             <span class="room-name">${name}</span>
