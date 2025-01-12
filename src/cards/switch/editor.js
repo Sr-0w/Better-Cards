@@ -4,7 +4,7 @@ export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
     return {
       hass: { type: Object },
-      config: { type: Object }
+      config: { type: Object },
     };
   }
 
@@ -24,11 +24,13 @@ export class BetterSwitchCardEditor extends LitElement {
         color: var(--primary-text-color, #000);
       }
 
-      ha-entity-picker,
+      ha-entity-picker {
+        width: 100%;
+      }
+
       ha-textfield,
       ha-icon-picker {
         width: 100%;
-        --text-field-margin: 8px 0;
       }
     `;
   }
@@ -38,19 +40,19 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 
   get _entity() {
-    return this.config.entity || '';
+    return this.config?.entity || '';
   }
 
   get _name() {
-    return this.config.name || '';
+    return this.config?.name || '';
   }
 
   get _icon() {
-    return this.config.icon || '';
+    return this.config?.icon || '';
   }
 
   get _animation_duration() {
-    return this.config.animation_duration || 500;
+    return this.config?.animation_duration || 500;
   }
 
   _valueChanged(ev) {
@@ -59,22 +61,20 @@ export class BetterSwitchCardEditor extends LitElement {
     const target = ev.target;
     if (!target.configValue) return;
 
-    let newValue = ev.detail?.value || target.value;
-
-    if (target.configValue === 'animation_duration') {
-      newValue = parseInt(newValue) || 500;
-    }
+    const newValue = ev.detail?.value || target.value;
 
     const newConfig = {
       ...this.config,
-      [target.configValue]: newValue
+      [target.configValue]: newValue,
     };
 
-    this.dispatchEvent(new CustomEvent('config-changed', {
-      detail: { config: newConfig },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent('config-changed', {
+        detail: { config: newConfig },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   render() {
@@ -85,30 +85,35 @@ export class BetterSwitchCardEditor extends LitElement {
     return html`
       <div class="card-config">
         <h2>General Settings</h2>
+        <!-- Entity Picker -->
         <ha-entity-picker
           .hass=${this.hass}
           .value=${this._entity}
           .configValue=${"entity"}
           .includeDomains=${["switch", "light", "input_boolean"]}
           @value-changed=${this._valueChanged}
-          label="Entity (Required)"
+          label="Select Entity"
         ></ha-entity-picker>
 
+        <!-- Name Field -->
         <ha-textfield
-          label="Name (Optional)"
+          label="Custom Name (Optional)"
           .value=${this._name}
           .configValue=${"name"}
           @input=${this._valueChanged}
         ></ha-textfield>
 
         <h2>Appearance</h2>
+        <!-- Icon Picker -->
         <ha-icon-picker
           .hass=${this.hass}
           .value=${this._icon}
           .configValue=${"icon"}
           @value-changed=${this._valueChanged}
+          label="Select Icon"
         ></ha-icon-picker>
 
+        <!-- Animation Duration -->
         <ha-textfield
           label="Animation Duration (ms)"
           type="number"
@@ -121,4 +126,4 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 }
 
-customElements.define("better-switch-card-editor", BetterSwitchCardEditor);
+customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
