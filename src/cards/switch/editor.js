@@ -4,7 +4,7 @@ import { fireEvent } from "custom-card-helpers";
 import { LovelaceCardEditor } from "custom-card-helpers";
 import { HaFormSchema } from "../../utils/form/ha-form";
 
-@customElement("better-switch-card-editor")
+customElement("better-switch-card-editor")
 export class BetterSwitchCardEditor
   extends HTMLElement
   implements LovelaceCardEditor
