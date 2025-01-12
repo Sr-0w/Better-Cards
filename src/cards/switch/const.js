@@ -8,11 +8,3 @@ export const DEFAULT_CONFIG = {
   icon: '',
   animation_duration: 500,
 };
-
-// Add validation schema if needed
-export const configStruct = {
-  entity: String,
-  name: String,
-  icon: String,
-  animation_duration: Number,
-};
