@@ -1,126 +1,86 @@
-import { html, LitElement, css } from "lit";
-import { fireEvent } from "custom-card-helpers";
-import { DOMAINS } from "./const";
+import { css } from 'lit';
 
-export class BetterSwitchCardEditor extends LitElement {
-  static get properties() {
-    return {
-      hass: { type: Object },
-      _config: { type: Object },
-    };
+export const styles = css`
+  :host {
+    display: block;
+    height: 100%;
   }
 
-  static get styles() {
-    return css`
-      .card-config {
-        padding: 16px;
-      }
-      ha-textfield {
-        display: block;
-        margin: 8px 0;
-      }
-      ha-entity-picker {
-        display: block;
-        margin: 8px 0;
-      }
-      ha-icon-picker {
-        display: block;
-        margin: 8px 0;
-      }
-    `;
+  ha-card {
+    height: 100%;
   }
 
-  setConfig(config) {
-    this._config = config;
+  .toggle-button {
+    width: 100%;
+    height: 100%;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    transition: all var(--animation-duration, 500ms) ease-in-out;
+    border: none;
+    border-radius: var(--ha-card-border-radius, 12px);
+    cursor: pointer;
+    margin: 0;
+    background: var(--ha-card-background, #1c1c1e);
+    color: var(--primary-text-color, white);
   }
 
-  _computeLabel(schema) {
-    const labels = {
-      entity: "Entity (Required)",
-      name: "Name (Optional)",
-      icon: "Icon",
-      animation_duration: "Animation Duration (ms)",
-    };
-    return labels[schema.name] || schema.name;
+  .toggle-button.off {
+    background-color: var(--ha-card-background, #1c1c1e);
+    color: var(--primary-text-color, white);
   }
 
-  get _entity() {
-    return this._config.entity || "";
+  .toggle-button.on {
+    background-color: white;
+    color: black;
   }
 
-  get _name() {
-    return this._config.name || "";
+  .toggle-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  get _icon() {
-    return this._config.icon || "";
+  .room-name {
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin-bottom: 4px;
   }
 
-  get _animation_duration() {
-    return this._config.animation_duration || 500;
+  .status {
+    font-size: 0.85rem;
+    opacity: 0.8;
   }
 
-  _valueChanged(ev) {
-    if (!this._config || !this.hass) {
-      return;
-    }
-    
-    const target = ev.target;
-    if (this[`_${target.configValue}`] === target.value) {
-      return;
-    }
-
-    let newValue = ev.detail?.value || target.value;
-    if (target.configValue === 'animation_duration') {
-      newValue = parseInt(newValue);
-    }
-
-    const newConfig = {
-      ...this._config,
-      [target.configValue]: newValue
-    };
-    
-    fireEvent(this, "config-changed", { config: newConfig });
+  .icon-container {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--animation-duration, 500ms);
   }
 
-  render() {
-    if (!this.hass || !this._config) {
-      return html``;
-    }
-
-    return html`
-      <div class="card-config">
-        <ha-entity-picker
-          .label="${this._computeLabel({ name: 'entity' })}"
-          .hass=${this.hass}
-          .value=${this._entity}
-          .configValue=${"entity"}
-          .includeDomains=${DOMAINS}
-          @value-changed=${this._valueChanged}
-          allow-custom-entity
-        ></ha-entity-picker>
-        <ha-textfield
-          label="${this._computeLabel({ name: 'name' })}"
-          .value=${this._name}
-          .configValue=${"name"}
-          @input=${this._valueChanged}
-        ></ha-textfield>
-        <ha-icon-picker
-          label="${this._computeLabel({ name: 'icon' })}"
-          .value=${this._icon}
-          .configValue=${"icon"}
-          @value-changed=${this._valueChanged}
-        ></ha-icon-picker>
-        <ha-textfield
-          label="${this._computeLabel({ name: 'animation_duration' })}"
-          type="number"
-          .value=${this._animation_duration}
-          .configValue=${"animation_duration"}
-          @input=${this._valueChanged}
-        ></ha-textfield>
-      </div>
-    `;
+  .off .icon-container {
+    background-color: white;
+    color: var(--ha-card-background, #1c1c1e);
   }
-}
 
-customElements.define("better-switch-card-editor", BetterSwitchCardEditor);
+  .on .icon-container {
+    background-color: var(--ha-card-background, #1c1c1e);
+    color: white;
+  }
+
+  .warning {
+    display: block;
+    color: var(--error-color);
+    padding: 16px;
+  }
+
+  ha-icon {
+    --mdc-icon-size: 24px;
+  }
+`;
