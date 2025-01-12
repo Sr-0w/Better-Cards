@@ -4,9 +4,10 @@
   "description": "A collection of better cards for Home Assistant",
   "type": "module",
   "main": "dist/better-cards.js",
+  "module": "dist/better-cards.js",
   "scripts": {
     "build": "rollup -c",
-    "lint": "eslint src/**/*.js",
+    "lint": "eslint src/**/*.{js,ts}",
     "watch": "rollup -c --watch",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint && npm run build"
@@ -26,24 +27,31 @@
     "README.md"
   ],
   "dependencies": {
-    "lit": "^2.7.0"
+    "lit": "^2.7.0",
+    "custom-card-helpers": "^1.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
-    "@babel/preset-typescript": "^7.21.4", 
+    "@babel/preset-typescript": "^7.21.4",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^24.1.0",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
-    "@rollup/plugin-typescript": "^10.0.0", 
+    "@rollup/plugin-typescript": "^11.1.0",
+    "@types/node": "^18.15.11",
     "eslint": "^8.38.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "rollup": "^3.20.2",
-    "rollup-plugin-serve": "^2.0.2"
+    "rollup-plugin-serve": "^2.0.2",
+    "typescript": "^5.0.4",
+    "tslib": "^2.5.0"
+  },
+  "peerDependencies": {
+    "custom-card-helpers": "^1.9.0"
   }
 }
