@@ -1,4 +1,4 @@
-import{css as t,LitElement as i,html as e}from"lit";import{fireEvent as n}from"custom-card-helpers";const a=(...t)=>console.info("[Better Cards]",...t),o="Better Switch Card",r=["switch","light","input_boolean"],c={entity:"",name:"",icon:"",animation_duration:500},s=t`
+import{css as t,LitElement as i,html as e}from"lit";import{fireEvent as n}from"custom-card-helpers";const a=(...t)=>console.info("[Better Cards]",...t),o="Better Switch Card",s=["switch","light","input_boolean"],r={entity:"",name:"",icon:"",animation_duration:500},c=t`
   :host {
     display: block;
     height: 100%;
@@ -81,54 +81,78 @@ import{css as t,LitElement as i,html as e}from"lit";import{fireEvent as n}from"c
   ha-icon {
     --mdc-icon-size: 24px;
   }
-`;customElements.define("better-switch-card-editor",class extends i{static get properties(){return{hass:{type:Object},_config:{type:Object}}}static get styles(){return t`
+`;customElements.define("better-switch-card-editor",class extends i{static get styles(){return t`
       .card-config {
         padding: 16px;
       }
-      ha-textfield {
-        display: block;
+      .editor-side-by-side {
+        display: flex;
         margin: 8px 0;
       }
-      ha-entity-picker {
-        display: block;
-        margin: 8px 0;
+      .editor-side-by-side > * {
+        flex: 1;
+        padding-right: 4px;
       }
-      ha-icon-picker {
-        display: block;
-        margin: 8px 0;
+      .editor-label {
+        margin-left: 6px;
+        font-size: 0.8em;
+        opacity: 0.75;
       }
-    `}setConfig(t){this._config=t}_computeLabel(t){return{entity:"Entity (Required)",name:"Name (Optional)",icon:"Icon",animation_duration:"Animation Duration (ms)"}[t.name]||t.name}get _entity(){return this._config.entity||""}get _name(){return this._config.name||""}get _icon(){return this._config.icon||""}get _animation_duration(){return this._config.animation_duration||500}_valueChanged(t){if(!this._config||!this.hass)return;const i=t.target;if(this[`_${i.configValue}`]===i.value)return;let e=t.detail?.value||i.value;"animation_duration"===i.configValue&&(e=parseInt(e));const a={...this._config,[i.configValue]:e};n(this,"config-changed",{config:a})}render(){return this.hass&&this._config?e`
+      paper-input {
+        width: 100%;
+      }
+    `}static get properties(){return{hass:{type:Object},_config:{type:Object}}}setConfig(t){this._config={...t}}get _entity(){return this._config.entity||""}get _name(){return this._config.name||""}get _icon(){return this._config.icon||""}get _animation_duration(){return this._config.animation_duration||500}get getEntitiesInDomain(){return Object.keys(this.hass.states).filter((t=>s.includes(t.split(".")[0])))}valueChanged(t){if(!this._config||!this.hass)return;const i=t.target;if(this[`_${i.configValue}`]===i.value)return;let e=i.value;"animation_duration"===i.configValue&&(e=parseInt(e,10)),""===e?delete this._config[i.configValue]:this._config={...this._config,[i.configValue]:e},n(this,"config-changed",{config:this._config})}render(){if(!this.hass||!this._config)return e``;const t=this.getEntitiesInDomain;return e`
       <div class="card-config">
-        <ha-entity-picker
-          .label="${this._computeLabel({name:"entity"})}"
-          .hass=${this.hass}
-          .value=${this._entity}
-          .configValue=${"entity"}
-          .includeDomains=${r}
-          @value-changed=${this._valueChanged}
-          allow-custom-entity
-        ></ha-entity-picker>
-        <ha-textfield
-          label="${this._computeLabel({name:"name"})}"
-          .value=${this._name}
-          .configValue=${"name"}
-          @input=${this._valueChanged}
-        ></ha-textfield>
-        <ha-icon-picker
-          label="${this._computeLabel({name:"icon"})}"
-          .value=${this._icon}
-          .configValue=${"icon"}
-          @value-changed=${this._valueChanged}
-        ></ha-icon-picker>
-        <ha-textfield
-          label="${this._computeLabel({name:"animation_duration"})}"
-          type="number"
-          .value=${this._animation_duration}
-          .configValue=${"animation_duration"}
-          @input=${this._valueChanged}
-        ></ha-textfield>
+        <div class="overall-config">
+          <div class="editor-side-by-side">
+            <div>
+              <span class="editor-label">Entity (Required)</span>
+              <select
+                .value=${this._entity}
+                .configValue=${"entity"}
+                @change=${this.valueChanged}
+                class="dropdown"
+              >
+                <option value="">Select entity</option>
+                ${t.map((t=>e`
+                  <option value=${t} ?selected=${t===this._entity}>
+                    ${t}
+                  </option>
+                `))}
+              </select>
+            </div>
+          </div>
+
+          <div class="editor-side-by-side">
+            <paper-input
+              label="Name"
+              .value=${this._name}
+              .configValue=${"name"}
+              @value-changed=${this.valueChanged}
+            ></paper-input>
+
+            <paper-input
+              label="Icon"
+              .value=${this._icon}
+              .configValue=${"icon"}
+              @value-changed=${this.valueChanged}
+            ></paper-input>
+          </div>
+
+          <div class="editor-side-by-side">
+            <paper-input
+              label="Animation Duration (ms)"
+              type="number"
+              min="100"
+              step="100"
+              .value=${this._animation_duration}
+              .configValue=${"animation_duration"}
+              @value-changed=${this.valueChanged}
+            ></paper-input>
+          </div>
+        </div>
       </div>
-    `:e``}}),a(`%c ${o} %c 1.0.0 `,"color: white; background: #555; font-weight: 700;","color: white; background: #000; font-weight: 700;"),window.customCards=window.customCards||[],window.customCards.push({type:"better-switch-card",name:o,description:"A stylish switch card with animations",preview:!0});customElements.define("better-switch-card",class extends i{static get properties(){return{hass:{type:Object},config:{type:Object}}}static get styles(){return s}static getConfigElement(){return document.createElement("better-switch-card-editor")}static getStubConfig(){return c}setConfig(t){if(!t.entity)throw new Error("Please define an entity");this.config={...c,...t}}_toggle(t){t.stopPropagation(),t.preventDefault();const i=this.hass.states[this.config.entity];if(!i)return;const e="on"===i.state?"turn_off":"turn_on",[n]=this.config.entity.split(".");this.hass.callService(n,e,{entity_id:this.config.entity})}render(){if(!this.hass||!this.config)return e``;const t=this.hass.states[this.config.entity];if(!t)return e`
+    `}}),a(`%c ${o} %c 1.0.0 `,"color: white; background: #555; font-weight: 700;","color: white; background: #000; font-weight: 700;"),window.customCards=window.customCards||[],window.customCards.push({type:"better-switch-card",name:o,description:"A stylish switch card with animations",preview:!0});customElements.define("better-switch-card",class extends i{static get properties(){return{hass:{type:Object},config:{type:Object}}}static get styles(){return c}static getConfigElement(){return document.createElement("better-switch-card-editor")}static getStubConfig(){return r}setConfig(t){if(!t.entity)throw new Error("Please define an entity");this.config={...r,...t}}_toggle(t){t.stopPropagation(),t.preventDefault();const i=this.hass.states[this.config.entity];if(!i)return;const e="on"===i.state?"turn_off":"turn_on",[n]=this.config.entity.split(".");this.hass.callService(n,e,{entity_id:this.config.entity})}render(){if(!this.hass||!this.config)return e``;const t=this.hass.states[this.config.entity];if(!t)return e`
         <ha-card>
           <div class="warning">
             Entity not found: ${this.config.entity}
