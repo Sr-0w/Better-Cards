@@ -5,91 +5,95 @@ export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
     return {
       hass: { type: Object },
-      _config: { type: Object },
+      config: { type: Object }
     };
   }
 
-  async firstUpdated() {
-    await this._loadComponents();
-  }
-
-  async _loadComponents() {
-    if (!customElements.get("ha-form")) {
-      await customElements.whenDefined("hui-button-card");
-    }
-  }
-
   setConfig(config) {
-    this._config = { ...DEFAULT_CONFIG, ...config };
-  }
-
-  static get styles() {
-    return '';
-  }
-
-  _valueChanged(ev) {
-    const config = ev.detail.value;
-    this.dispatchEvent(
-      new CustomEvent("config-changed", {
-        detail: { config },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
   get _entity() {
-    return this._config.entity || '';
+    return this.config.entity || '';
   }
 
   get _name() {
-    return this._config.name || '';
+    return this.config.name || '';
   }
 
   get _icon() {
-    return this._config.icon || '';
+    return this.config.icon || '';
+  }
+
+  get _animation_duration() {
+    return this.config.animation_duration || 500;
+  }
+
+  _valueChanged(ev) {
+    if (!this.config || !this.hass) return;
+
+    const target = ev.target;
+    if (!target.configValue) return;
+
+    let newValue = ev.detail?.value || target.value;
+    
+    if (target.configValue === 'animation_duration') {
+      newValue = parseInt(newValue) || 500;
+    }
+
+    const newConfig = {
+      ...this.config,
+      [target.configValue]: newValue
+    };
+
+    const event = new CustomEvent('config-changed', {
+      detail: { config: newConfig },
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(event);
   }
 
   render() {
-    if (!this.hass || !this._config) {
+    if (!this.hass || !this.config) {
       return html``;
     }
 
     return html`
       <div class="card-config">
-        <paper-input
+        <ha-entity-picker
+          .hass=${this.hass}
+          .value=${this._entity}
+          .configValue=${"entity"}
+          .includeDomains=${["switch", "light", "input_boolean"]}
+          @value-changed=${this._valueChanged}
           label="Entity (Required)"
-          .value="${this._entity}"
-          .configValue=${'entity'}
-          @value-changed=${this._valueChanged}
-        ></paper-input>
+        ></ha-entity-picker>
 
-        <paper-input
+        <ha-textfield
           label="Name (Optional)"
-          .value="${this._name}"
-          .configValue=${'name'}
-          @value-changed=${this._valueChanged}
-        ></paper-input>
+          .value=${this._name}
+          .configValue=${"name"}
+          @input=${this._valueChanged}
+        ></ha-textfield>
 
-        <paper-input
-          label="Icon (Optional)"
-          .value="${this._icon}"
-          .configValue=${'icon'}
+        <ha-icon-picker
+          .hass=${this.hass}
+          .value=${this._icon}
+          .configValue=${"icon"}
           @value-changed=${this._valueChanged}
-        ></paper-input>
-        
-        <paper-input
+        ></ha-icon-picker>
+
+        <ha-textfield
           label="Animation Duration (ms)"
           type="number"
-          .value="${this._config.animation_duration}"
-          .configValue=${'animation_duration'}
-          @value-changed=${this._valueChanged}
-        ></paper-input>
+          .value=${this._animation_duration}
+          .configValue=${"animation_duration"}
+          @input=${this._valueChanged}
+        ></ha-textfield>
       </div>
     `;
   }
 }
 
-if (!customElements.get('better-switch-card-editor')) {
-  customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
-}
+customElements.define("better-switch-card-editor", BetterSwitchCardEditor);
