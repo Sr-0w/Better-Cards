@@ -1,15 +1,15 @@
 {
   "name": "better-cards",
-  "version": "1.0.1", 
+  "version": "1.0.1",
   "description": "A collection of better cards for Home Assistant",
   "type": "module",
-  "main": "dist/better-cards.js", 
+  "main": "dist/better-cards.js",
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint src/**/*.js",
     "watch": "rollup -c --watch",
-    "prepare": "npm run build", 
-    "prepublishOnly": "npm run lint && npm run build" 
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
     "home-assistant",
@@ -22,7 +22,7 @@
   "author": "Your Name",
   "license": "MIT",
   "files": [
-    "dist", 
+    "dist",
     "README.md"
   ],
   "dependencies": {
@@ -31,11 +31,13 @@
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4", 
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^24.1.0",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
+    "@rollup/plugin-typescript": "^10.0.0", 
     "eslint": "^8.38.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
