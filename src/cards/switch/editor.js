@@ -1,15 +1,7 @@
+// editor.js
 import { LitElement, html, css } from 'lit';
 import { fireEvent, createThing } from 'custom-card-helpers';
 import { DOMAINS } from './const';
-
-// Home Assistant will provide these components
-declare global {
-  interface HTMLElementTagNameMap {
-    'ha-entity-picker': any;
-    'ha-icon-picker': any;
-    'ha-textfield': any;
-  }
-}
 
 export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
