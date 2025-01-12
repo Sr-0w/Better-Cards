@@ -28,7 +28,10 @@
   ],
   "dependencies": {
     "lit": "^2.7.0",
-    "custom-card-helpers": "^1.9.0"
+    "custom-card-helpers": "^1.9.0",
+    "@material/mwc-ripple": "^0.27.0",
+    "@material/mwc-icon-button": "^0.27.0",
+    "home-assistant-js-websocket": "^8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
@@ -52,6 +55,7 @@
     "tslib": "^2.5.0"
   },
   "peerDependencies": {
-    "custom-card-helpers": "^1.9.0"
+    "custom-card-helpers": "^1.9.0",
+    "home-assistant-js-websocket": "^8.0.1"
   }
 }
