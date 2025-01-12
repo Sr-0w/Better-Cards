@@ -1,8 +1,8 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import babel from '@rollup/plugin-babel';
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
-import babel from '@rollup/plugin-babel';
 import json from '@rollup/plugin-json';
 import serve from 'rollup-plugin-serve';
 
@@ -21,12 +21,23 @@ export default {
       preferBuiltins: false,
     }),
     commonjs(),
-    typescript(),
-    json(),
     babel({
       babelHelpers: 'bundled',
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
+      presets: [
+        ['@babel/preset-env', { 
+          targets: { 
+            esmodules: true 
+          } 
+        }]
+      ],
+      plugins: [
+        ['@babel/plugin-proposal-decorators', { legacy: true }],
+        ['@babel/plugin-proposal-class-properties']
+      ]
     }),
+    typescript(),
+    json(),
     terser(),
     ...(dev ? [
       serve({
@@ -44,17 +55,7 @@ export default {
     'lit',
     'lit/decorators.js',
     'custom-card-helpers',
-    'home-assistant-js-websocket',
     '@material/mwc-ripple',
-    '@material/mwc-icon-button',
-    'ha-entity-picker',
-    'ha-icon-picker',
-    'ha-textfield'
-  ],
-  onwarn(warning, warn) {
-    // Skip certain warnings
-    if (warning.code === 'THIS_IS_UNDEFINED') return;
-    // Use default for everything else
-    warn(warning);
-  }
+    '@material/mwc-icon-button'
+  ]
 };
