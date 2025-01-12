@@ -1,7 +1,11 @@
 // editor.js
 import { LitElement, html, css } from 'lit';
-import { fireEvent, hasConfigOrEntityChanged } from 'custom-card-helpers';
 import { DOMAINS } from './const';
+
+// Import required Home Assistant components
+await import('https://unpkg.com/custom-card-helpers@1.9.0/dist/index.js?module');
+await import('https://www.home-assistant.io/package/ha-entity-picker.js?type=module');
+await import('https://www.home-assistant.io/package/ha-icon-picker.js?type=module');
 
 export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
@@ -12,21 +16,25 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 
   setConfig(config) {
+    console.log('Editor setConfig called with:', config);
     this._config = { ...config };
   }
 
-  firstUpdated() {
-    // Ensure editor updates when config changes
-    fireEvent(this, 'config-changed', { config: this._config });
-  }
-
-  // Add shouldUpdate lifecycle method
-  shouldUpdate(changedProps) {
-    return hasConfigOrEntityChanged(this, changedProps);
-  }
-
   get _entity() {
+    console.log('Getting entity value:', this._config?.entity);
     return this._config?.entity || '';
+  }
+
+  get _name() {
+    return this._config?.name || '';
+  }
+
+  get _icon() {
+    return this._config?.icon || '';
+  }
+
+  get _animation_duration() {
+    return this._config?.animation_duration || 500;
   }
 
   get getEntitiesInDomain() {
@@ -37,28 +45,52 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 
   valueChanged(ev) {
-    if (!this._config || !this.hass) return;
-    
+    console.log('Value changed event:', ev);
+    if (!this._config) return;
+
     const target = ev.target;
-    if (target.configValue === undefined) return;
+    const value = ev.detail?.value ?? target.value;
+    const configValue = target.configValue;
+    
+    console.log('Updating config:', { configValue, value });
+    
+    if (!configValue) return;
 
-    if (this[`_${target.configValue}`] === target.value) return;
+    let newConfig = {
+      ...this._config,
+      [configValue]: value
+    };
 
-    let newValue = target.value;
-    if (target.configValue === 'animation_duration') {
-      newValue = parseInt(newValue, 10);
+    if (configValue === 'animation_duration') {
+      newConfig[configValue] = parseInt(value, 10);
     }
 
-    this._config = {
-      ...this._config,
-      [target.configValue]: newValue
-    };
-    
-    fireEvent(this, 'config-changed', { config: this._config });
+    // Fire the config changed event
+    const event = new CustomEvent('config-changed', {
+      detail: { config: newConfig },
+      bubbles: true,
+      composed: true
+    });
+    console.log('Dispatching config-changed event:', event);
+    this.dispatchEvent(event);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    console.log('Editor connected');
+  }
+
+  firstUpdated() {
+    console.log('Editor first updated');
+  }
+
+  updated(changedProps) {
+    console.log('Editor updated:', changedProps);
   }
 
   render() {
-    if (!this.hass || !this._config) {
+    console.log('Editor rendering with config:', this._config);
+    if (!this._config) {
       return html``;
     }
 
@@ -66,67 +98,70 @@ export class BetterSwitchCardEditor extends LitElement {
 
     return html`
       <div class="card-config">
-        <div class="overall-config">
-          <div class="editor-side-by-side">
-            <ha-entity-picker
-              .hass=${this.hass}
-              .value=${this._entity}
-              .configValue=${'entity'}
-              .includeDomains=${DOMAINS}
-              @value-changed=${this.valueChanged}
-              allow-custom-entity
-            ></ha-entity-picker>
-          </div>
+        <div class="side-by-side">
+          <ha-entity-picker
+            .label="Entity (Required)"
+            .hass=${this.hass}
+            .value=${this._entity}
+            .configValue=${"entity"}
+            .includeDomains=${DOMAINS}
+            @value-changed=${this.valueChanged}
+          ></ha-entity-picker>
+        </div>
 
-          <div class="editor-side-by-side">
-            <ha-textfield
-              label="Name"
-              .value=${this._config.name || ''}
-              .configValue=${'name'}
-              @input=${this.valueChanged}
-            ></ha-textfield>
+        <div class="side-by-side">
+          <paper-input
+            label="Name"
+            .value=${this._name}
+            .configValue=${"name"}
+            @value-changed=${this.valueChanged}
+          ></paper-input>
+          
+          <ha-icon-picker
+            .label="Icon"
+            .value=${this._icon}
+            .configValue=${"icon"}
+            @value-changed=${this.valueChanged}
+          ></ha-icon-picker>
+        </div>
 
-            <ha-icon-picker
-              label="Icon"
-              .value=${this._config.icon || ''}
-              .configValue=${'icon'}
-              @value-changed=${this.valueChanged}
-            ></ha-icon-picker>
-          </div>
-
-          <div class="editor-side-by-side">
-            <ha-textfield
-              label="Animation Duration (ms)"
-              type="number"
-              min="100"
-              step="100"
-              .value=${this._config.animation_duration || 500}
-              .configValue=${'animation_duration'}
-              @input=${this.valueChanged}
-            ></ha-textfield>
-          </div>
+        <div class="side-by-side">
+          <paper-input
+            label="Animation Duration (ms)"
+            type="number"
+            min="100"
+            step="100"
+            .value=${this._animation_duration}
+            .configValue=${"animation_duration"}
+            @value-changed=${this.valueChanged}
+          ></paper-input>
         </div>
       </div>
     `;
   }
 
-  static styles = css`
-    ha-textfield {
-      display: block;
-      margin: 8px 0;
-    }
-    
-    .editor-side-by-side {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-gap: 8px;
-      margin: 8px 0;
-    }
-    
-    .card-config {
-      padding: 16px;
-    }
-  `;
+  static get styles() {
+    return css`
+      .card-config {
+        padding: 16px;
+      }
+      .side-by-side {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+      }
+      ha-entity-picker {
+        width: 100%;
+      }
+      paper-input {
+        width: 100%;
+      }
+      paper-input[type="number"] {
+        width: 100%;
+      }
+    `;
+  }
 }
 
 customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
