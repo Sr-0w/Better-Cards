@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { DEFAULT_CONFIG, CARD_VERSION, CARD_NAME } from './const';
 import { styles } from './styles';
+import './editor';
 import { log } from '../../shared/utils';
 
 log.info(
@@ -29,8 +30,7 @@ class BetterSwitchCard extends LitElement {
     return styles;
   }
 
-  static async getConfigElement() {
-    await import('./editor');
+  static getConfigElement() {
     return document.createElement("better-switch-card-editor");
   }
 
