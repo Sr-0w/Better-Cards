@@ -20,9 +20,11 @@ const serveOpts = {
 export default {
   input: 'src/index.js',
   output: {
-    file: 'dist/better-cards.js',
+    dir: 'dist',
     format: 'es',
-    sourcemap: true
+    sourcemap: true,
+    inlineDynamicImports: true,
+    entryFileNames: 'better-cards.js'
   },
   plugins: [
     nodeResolve(),
