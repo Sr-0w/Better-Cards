@@ -31,6 +31,13 @@ export default {
     babel({
       babelHelpers: 'bundled',
       exclude: 'node_modules/**',
+      presets: [
+        '@babel/preset-env', // For modern JS
+        '@babel/preset-typescript', // If using TypeScript
+      ],
+      plugins: [
+        ['@babel/plugin-proposal-decorators', { legacy: true }], // Enable decorators
+      ],
     }),
     !dev && terser(),
     dev && serve(serveOpts),
