@@ -1,11 +1,15 @@
-// editor.js
 import { LitElement, html, css } from 'lit';
+import { fireEvent, createThing } from 'custom-card-helpers';
 import { DOMAINS } from './const';
 
-// Import required Home Assistant components
-await import('https://unpkg.com/custom-card-helpers@1.9.0/dist/index.js?module');
-await import('https://www.home-assistant.io/package/ha-entity-picker.js?type=module');
-await import('https://www.home-assistant.io/package/ha-icon-picker.js?type=module');
+// Home Assistant will provide these components
+declare global {
+  interface HTMLElementTagNameMap {
+    'ha-entity-picker': any;
+    'ha-icon-picker': any;
+    'ha-textfield': any;
+  }
+}
 
 export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
@@ -16,12 +20,17 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 
   setConfig(config) {
-    console.log('Editor setConfig called with:', config);
     this._config = { ...config };
   }
 
+  firstUpdated() {
+    // Ensure all custom elements are loaded
+    customElements.whenDefined('ha-entity-picker').then(() => {
+      this.requestUpdate();
+    });
+  }
+
   get _entity() {
-    console.log('Getting entity value:', this._config?.entity);
     return this._config?.entity || '';
   }
 
@@ -37,22 +46,12 @@ export class BetterSwitchCardEditor extends LitElement {
     return this._config?.animation_duration || 500;
   }
 
-  get getEntitiesInDomain() {
-    if (!this.hass) return [];
-    return Object.keys(this.hass.states).filter(
-      eid => DOMAINS.includes(eid.split('.')[0])
-    );
-  }
-
   valueChanged(ev) {
-    console.log('Value changed event:', ev);
-    if (!this._config) return;
+    if (!this._config || !this.hass) return;
 
     const target = ev.target;
     const value = ev.detail?.value ?? target.value;
     const configValue = target.configValue;
-    
-    console.log('Updating config:', { configValue, value });
     
     if (!configValue) return;
 
@@ -62,63 +61,40 @@ export class BetterSwitchCardEditor extends LitElement {
     };
 
     if (configValue === 'animation_duration') {
-      newConfig[configValue] = parseInt(value, 10);
+      newConfig[configValue] = parseInt(value, 10) || 500;
     }
 
-    // Fire the config changed event
-    const event = new CustomEvent('config-changed', {
-      detail: { config: newConfig },
-      bubbles: true,
-      composed: true
-    });
-    console.log('Dispatching config-changed event:', event);
-    this.dispatchEvent(event);
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-    console.log('Editor connected');
-  }
-
-  firstUpdated() {
-    console.log('Editor first updated');
-  }
-
-  updated(changedProps) {
-    console.log('Editor updated:', changedProps);
+    fireEvent(this, 'config-changed', { config: newConfig });
   }
 
   render() {
-    console.log('Editor rendering with config:', this._config);
-    if (!this._config) {
+    if (!this._config || !this.hass) {
       return html``;
     }
-
-    const entities = this.getEntitiesInDomain;
 
     return html`
       <div class="card-config">
         <div class="side-by-side">
           <ha-entity-picker
-            .label="Entity (Required)"
             .hass=${this.hass}
             .value=${this._entity}
             .configValue=${"entity"}
             .includeDomains=${DOMAINS}
             @value-changed=${this.valueChanged}
+            allow-custom-entity
           ></ha-entity-picker>
         </div>
 
         <div class="side-by-side">
-          <paper-input
+          <ha-textfield
             label="Name"
             .value=${this._name}
             .configValue=${"name"}
-            @value-changed=${this.valueChanged}
-          ></paper-input>
+            @input=${this.valueChanged}
+          ></ha-textfield>
           
           <ha-icon-picker
-            .label="Icon"
+            label="Icon"
             .value=${this._icon}
             .configValue=${"icon"}
             @value-changed=${this.valueChanged}
@@ -126,15 +102,15 @@ export class BetterSwitchCardEditor extends LitElement {
         </div>
 
         <div class="side-by-side">
-          <paper-input
+          <ha-textfield
             label="Animation Duration (ms)"
             type="number"
             min="100"
             step="100"
             .value=${this._animation_duration}
             .configValue=${"animation_duration"}
-            @value-changed=${this.valueChanged}
-          ></paper-input>
+            @input=${this.valueChanged}
+          ></ha-textfield>
         </div>
       </div>
     `;
@@ -151,13 +127,8 @@ export class BetterSwitchCardEditor extends LitElement {
         gap: 8px;
         margin: 8px 0;
       }
-      ha-entity-picker {
-        width: 100%;
-      }
-      paper-input {
-        width: 100%;
-      }
-      paper-input[type="number"] {
+      ha-entity-picker,
+      ha-textfield {
         width: 100%;
       }
     `;
