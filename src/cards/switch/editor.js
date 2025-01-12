@@ -1,36 +1,32 @@
 import { html, nothing } from "lit";
-import { customElement, state } from "lit/decorators.js";
 import { fireEvent } from "custom-card-helpers";
-import { LovelaceCardEditor } from "custom-card-helpers";
-import { HaFormSchema } from "../../utils/form/ha-form";
 
-customElement("better-switch-card-editor")
-export class BetterSwitchCardEditor
-  extends HTMLElement
-implements LovelaceCardEditor
-{
-  @state() private _config?: Record<string, any>;
+class BetterSwitchCardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this._config = {};
+  }
 
-  setConfig(config: Record<string, any>): void {
+  setConfig(config) {
     this._config = config;
   }
 
-  private _computeLabel = (schema: HaFormSchema) => {
-    const labels: Record<string, string> = {
+  _computeLabel(schema) {
+    const labels = {
       entity: "Entity (Required)",
       name: "Name (Optional)",
       icon: "Icon",
       animation_duration: "Animation Duration (ms)",
     };
     return labels[schema.name] || schema.name;
-  };
+  }
 
-  protected render() {
+  render() {
     if (!this.hass || !this._config) {
       return nothing;
     }
 
-    const SCHEMA: HaFormSchema[] = [
+    const schema = [
       { name: "entity", selector: { entity: { domain: ["switch", "light", "input_boolean"] } } },
       { name: "name", selector: { text: {} } },
       { name: "icon", selector: { icon: {} } },
@@ -41,14 +37,18 @@ implements LovelaceCardEditor
       <ha-form
         .hass=${this.hass}
         .data=${this._config}
-        .schema=${SCHEMA}
+        .schema=${schema}
         .computeLabel=${this._computeLabel}
         @value-changed=${this._valueChanged}
       ></ha-form>
     `;
   }
 
-  private _valueChanged(ev: CustomEvent): void {
+  _valueChanged(ev) {
     fireEvent(this, "config-changed", { config: ev.detail.value });
   }
 }
+
+customElements.define("better-switch-card-editor", BetterSwitchCardEditor);
+
+export default BetterSwitchCardEditor;
