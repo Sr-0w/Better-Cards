@@ -1,13 +1,15 @@
 {
   "name": "better-cards",
-  "version": "1.0.0",
+  "version": "1.0.1", 
   "description": "A collection of better cards for Home Assistant",
   "type": "module",
-  "main": "dist/better-cards.js",
+  "main": "dist/better-cards.js", 
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint src/**/*.js",
-    "watch": "rollup -c --watch"
+    "watch": "rollup -c --watch",
+    "prepare": "npm run build", 
+    "prepublishOnly": "npm run lint && npm run build" 
   },
   "keywords": [
     "home-assistant",
@@ -19,6 +21,10 @@
   ],
   "author": "Your Name",
   "license": "MIT",
+  "files": [
+    "dist", 
+    "README.md"
+  ],
   "dependencies": {
     "lit": "^2.7.0"
   },
