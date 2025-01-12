@@ -37,6 +37,9 @@ export default {
       ],
       plugins: [
         ['@babel/plugin-proposal-decorators', { legacy: true }], // Enable decorators
+        ['@babel/plugin-transform-class-properties', { loose: true }], // Make sure 'loose' mode is true
+        ['@babel/plugin-transform-private-methods', { loose: true }], // Same for private methods
+        ['@babel/plugin-transform-private-property-in-object', { loose: true }], // And for private property accessors
       ],
     }),
     !dev && terser(),
