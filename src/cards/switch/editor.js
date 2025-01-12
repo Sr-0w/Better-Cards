@@ -7,7 +7,7 @@ import { HaFormSchema } from "../../utils/form/ha-form";
 customElement("better-switch-card-editor")
 export class BetterSwitchCardEditor
   extends HTMLElement
-  implements LovelaceCardEditor
+implements LovelaceCardEditor
 {
   @state() private _config?: Record<string, any>;
 
