@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, css } from 'lit';
 
 export class BetterSwitchCardEditor extends LitElement {
   static get properties() {
@@ -6,6 +6,31 @@ export class BetterSwitchCardEditor extends LitElement {
       hass: { type: Object },
       config: { type: Object }
     };
+  }
+
+  static get styles() {
+    return css`
+      .card-config {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin: 0 0 8px;
+        color: var(--primary-text-color, #000);
+      }
+
+      ha-entity-picker,
+      ha-textfield,
+      ha-icon-picker {
+        width: 100%;
+        --text-field-margin: 8px 0;
+      }
+    `;
   }
 
   setConfig(config) {
@@ -35,7 +60,7 @@ export class BetterSwitchCardEditor extends LitElement {
     if (!target.configValue) return;
 
     let newValue = ev.detail?.value || target.value;
-    
+
     if (target.configValue === 'animation_duration') {
       newValue = parseInt(newValue) || 500;
     }
@@ -45,12 +70,11 @@ export class BetterSwitchCardEditor extends LitElement {
       [target.configValue]: newValue
     };
 
-    const event = new CustomEvent('config-changed', {
+    this.dispatchEvent(new CustomEvent('config-changed', {
       detail: { config: newConfig },
       bubbles: true,
       composed: true
-    });
-    this.dispatchEvent(event);
+    }));
   }
 
   render() {
@@ -60,6 +84,7 @@ export class BetterSwitchCardEditor extends LitElement {
 
     return html`
       <div class="card-config">
+        <h2>General Settings</h2>
         <ha-entity-picker
           .hass=${this.hass}
           .value=${this._entity}
@@ -76,6 +101,7 @@ export class BetterSwitchCardEditor extends LitElement {
           @input=${this._valueChanged}
         ></ha-textfield>
 
+        <h2>Appearance</h2>
         <ha-icon-picker
           .hass=${this.hass}
           .value=${this._icon}
