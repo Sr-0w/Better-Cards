@@ -28,7 +28,7 @@ export const styles = css`
   }
 
   .toggle-button.off {
-    background-color: var(--ha-card-background, #1c1c1e);
+    background-color: black;
     color: var(--primary-text-color, white);
   }
 
