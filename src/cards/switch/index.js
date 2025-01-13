@@ -2,7 +2,6 @@
 import { LitElement, html } from 'lit';
 import { DEFAULT_CONFIG, CARD_VERSION, CARD_NAME } from './const';
 import { styles } from './styles';
-import './editor';
 
 console.info(
   `%c ${CARD_NAME} %c ${CARD_VERSION} `,
@@ -15,7 +14,8 @@ window.customCards.push({
   type: "better-switch-card",
   name: CARD_NAME,
   description: "A stylish switch card with animations",
-  preview: true
+  preview: true,
+  documentationURL: "" // Optional: Add your documentation URL
 });
 
 class BetterSwitchCard extends LitElement {
@@ -30,8 +30,9 @@ class BetterSwitchCard extends LitElement {
     return styles;
   }
 
+  // Remove the import here as we'll handle it differently
   static async getConfigElement() {
-    await import('./editor');
+    // We'll load the editor synchronously since it's already imported in the HTML
     return document.createElement("better-switch-card-editor");
   }
 
@@ -108,6 +109,9 @@ class BetterSwitchCard extends LitElement {
   }
 }
 
-customElements.define('better-switch-card', BetterSwitchCard);
+// Make sure the editor is loaded before defining the card
+customElements.whenDefined('better-switch-card-editor').then(() => {
+  customElements.define('better-switch-card', BetterSwitchCard);
+});
 
 export default BetterSwitchCard;
