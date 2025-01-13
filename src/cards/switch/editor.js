@@ -1,91 +1,64 @@
 // editor.js
-import { LitElement, html, css } from 'lit';
+import { html, nothing } from 'lit';
 import { fireEvent } from 'custom-card-helpers';
+import { BaseElement } from './utils/base-element';
+import { SWITCH_SCHEMA } from './shared/config/schema';
+import { setupCustomLocalize, GENERIC_LABELS } from './utils/localize';
 import { DOMAINS } from './const';
 
-export class BetterSwitchCardEditor extends LitElement {
-  static get properties() {
-    return {
-      hass: { type: Object },
-      _config: { type: Object },
-    };
-  }
-
-  setConfig(config) {
-    this._config = { ...config };
-  }
-
-  _valueChanged(ev) {
-    const target = ev.target;
-    const value = ev.detail?.value || target.value;
-    
-    if (this._config) {
-      const newConfig = {
-        ...this._config,
-        [target.configValue]: value
-      };
-      
-      fireEvent(this, 'config-changed', { config: newConfig });
-    }
-  }
-
-  render() {
-    if (!this.hass || !this._config) {
-      return html``;
+export class BetterSwitchCardEditor extends BaseElement {
+    static get properties() {
+        return {
+            ...super.properties,
+            _config: { state: true },
+        };
     }
 
-    return html`
-      <div class="card-config">
-        <div class="values">
-          <ha-selector-entity
-            .hass=${this.hass}
-            .value=${this._config.entity}
-            .configValue=${"entity"}
-            .includeDomains=${DOMAINS}
-            .required=${true}
-            @value-changed=${this._valueChanged}
-          ></ha-selector-entity>
-        </div>
-        <div class="values">
-          <ha-textfield
-            label="Name (Optional)"
-            .value=${this._config.name || ''}
-            .configValue=${"name"}
-            @change=${this._valueChanged}
-          ></ha-textfield>
-        </div>
-        <div class="values">
-          <ha-selector-icon
-            label="Icon (Optional)"
-            .hass=${this.hass}
-            .value=${this._config.icon}
-            .configValue=${"icon"}
-            @value-changed=${this._valueChanged}
-          ></ha-selector-icon>
-        </div>
-        <div class="values">
-          <ha-textfield
-            label="Animation Duration (ms)"
-            type="number"
-            .value=${this._config.animation_duration || 500}
-            .configValue=${"animation_duration"}
-            @change=${this._valueChanged}
-          ></ha-textfield>
-        </div>
-      </div>
-    `;
-  }
+    async firstUpdated() {
+        await this._loadComponents();
+    }
 
-  static get styles() {
-    return css`
-      .values {
-        padding-bottom: 8px;
-      }
-      ha-textfield {
-        width: 100%;
-      }
-    `;
-  }
+    async _loadComponents() {
+        if (!customElements.get("ha-form")) {
+            await customElements.whenDefined("hui-action-editor");
+            const helpers = await window.loadCardHelpers();
+            if (helpers) await helpers.importMoreInfoControl("light");
+        }
+    }
+
+    setConfig(config) {
+        this._config = { ...config };
+    }
+
+    _computeLabel(schema) {
+        const customLocalize = setupCustomLocalize(this.hass);
+
+        if (GENERIC_LABELS.includes(schema.name)) {
+            return customLocalize(`editor.card.generic.${schema.name}`);
+        }
+        
+        return customLocalize(schema.name);
+    }
+
+    _valueChanged(ev) {
+        fireEvent(this, "config-changed", { config: ev.detail.value });
+    }
+
+    render() {
+        if (!this.hass || !this._config) {
+            return nothing;
+        }
+
+        return html`
+            <ha-form
+                .hass=${this.hass}
+                .data=${this._config}
+                .schema=${SWITCH_SCHEMA}
+                .computeLabel=${this._computeLabel}
+                @value-changed=${this._valueChanged}
+            ></ha-form>
+        `;
+    }
 }
 
 customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
