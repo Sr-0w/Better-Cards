@@ -1,17 +1,17 @@
 // editor.js
 import { html, nothing } from 'lit';
-import { fireEvent } from 'custom-card-helpers';
 import { BaseElement } from './utils/base-element';
+import { fireEvent } from 'custom-card-helpers';
+import { loadHaComponents } from './utils/loader';
 import { DOMAINS } from './const';
 
-// Schema definition matching mushroom's pattern more closely
 const SCHEMA = [
     { 
         name: "entity", 
         required: true,
         selector: { 
             entity: { 
-                domain: DOMAINS,
+                domain: DOMAINS 
             } 
         } 
     },
@@ -50,35 +50,12 @@ export class BetterSwitchCardEditor extends BaseElement {
         return {
             ...super.properties,
             _config: { state: true },
-            _loaded: { state: true, type: Boolean }
         };
     }
 
-    constructor() {
-        super();
-        this._loaded = false;
-    }
-
-    async connectedCallback() {
+    connectedCallback() {
         super.connectedCallback();
-        await this._loadComponents();
-    }
-
-    async _loadComponents() {
-        try {
-            if (!customElements.get("ha-form")) {
-                const helpers = await window.loadCardHelpers();
-                if (helpers) {
-                    await helpers.importMoreInfoControl("light");
-                }
-            }
-            await customElements.whenDefined("ha-selector");
-            await customElements.whenDefined("ha-entity-selector");
-            this._loaded = true;
-            this.requestUpdate();
-        } catch (error) {
-            console.error("Failed to load components:", error);
-        }
+        void loadHaComponents();
     }
 
     setConfig(config) {
@@ -89,9 +66,23 @@ export class BetterSwitchCardEditor extends BaseElement {
         fireEvent(this, "config-changed", { config: ev.detail.value });
     }
 
+    _computeLabel(schema) {
+        if (!this.hass) return "";
+        
+        const entityName = "Entity";
+        const defaultLabels = {
+            "entity": entityName,
+            "name": "Name",
+            "icon": "Icon",
+            "animation_duration": "Animation Duration"
+        };
+
+        return defaultLabels[schema.name] || schema.name;
+    }
+
     render() {
-        if (!this.hass || !this._config || !this._loaded) {
-            return html`<div>Loading editor...</div>`;
+        if (!this.hass || !this._config) {
+            return nothing;
         }
 
         return html`
@@ -99,7 +90,7 @@ export class BetterSwitchCardEditor extends BaseElement {
                 .hass=${this.hass}
                 .data=${this._config}
                 .schema=${SCHEMA}
-                .computeLabel=${(schema) => schema.name}
+                .computeLabel=${this._computeLabel}
                 @value-changed=${this._valueChanged}
             ></ha-form>
         `;
