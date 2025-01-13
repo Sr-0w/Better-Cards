@@ -46,24 +46,45 @@ export class BetterSwitchCardEditor extends LitElement {
     return {
       hass: { type: Object },
       _config: { type: Object },
+      _loaded: { type: Boolean, state: true }
     };
+  }
+
+  constructor() {
+    super();
+    this._loaded = false;
   }
 
   setConfig(config) {
     this._config = { ...config };
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-    this._loadComponents();
+  async firstUpdated() {
+    await this._loadComponents();
   }
 
   async _loadComponents() {
-    if (customElements.get('ha-form')) return;
-    
-    await customElements.whenDefined('hui-action-editor');
-    const helpers = await window.loadCardHelpers();
-    if (helpers) await helpers.importMoreInfoControl("light");
+    if (!window.customCards) window.customCards = [];
+
+    // Make sure we only load components once
+    if (this._loaded) return;
+
+    try {
+      if (!customElements.get('ha-form')) {
+        await customElements.whenDefined('hui-action-editor');
+        const helpers = await window.loadCardHelpers();
+        if (helpers) {
+          await helpers.importMoreInfoControl("light");
+        }
+      }
+
+      // Wait a bit to ensure everything is properly registered
+      await new Promise(resolve => setTimeout(resolve, 0));
+      this._loaded = true;
+      await this.updateComplete;
+    } catch (error) {
+      console.error("Failed to load components:", error);
+    }
   }
 
   _valueChanged(ev) {
@@ -74,8 +95,8 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 
   render() {
-    if (!this.hass || !this._config) {
-      return html``;
+    if (!this.hass || !this._config || !this._loaded) {
+      return html`<div>Loading editor...</div>`;
     }
 
     return html`
@@ -90,4 +111,7 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 }
 
-customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
+// Important: Register the editor element AFTER the class definition
+if (!customElements.get('better-switch-card-editor')) {
+  customElements.define('better-switch-card-editor', BetterSwitchCardEditor);
+}
