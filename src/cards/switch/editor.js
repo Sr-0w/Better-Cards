@@ -1,9 +1,16 @@
 // editor.js
-import { html, nothing } from 'lit';
-import { BaseElement } from './utils/base-element';
+import { LitElement, html, nothing } from 'lit';
 import { fireEvent } from 'custom-card-helpers';
-import { loadHaComponents } from './utils/loader';
 import { DOMAINS } from './const';
+
+// Loader function included directly
+const loadHaComponents = async () => {
+    if (!customElements.get("ha-form")) {
+        await customElements.whenDefined("hui-view");
+        await window.loadCardHelpers();
+        await customElements.whenDefined("ha-form");
+    }
+};
 
 const SCHEMA = [
     { 
@@ -45,10 +52,10 @@ const SCHEMA = [
     }
 ];
 
-export class BetterSwitchCardEditor extends BaseElement {
+export class BetterSwitchCardEditor extends LitElement {
     static get properties() {
         return {
-            ...super.properties,
+            hass: { type: Object },
             _config: { state: true },
         };
     }
@@ -69,9 +76,8 @@ export class BetterSwitchCardEditor extends BaseElement {
     _computeLabel(schema) {
         if (!this.hass) return "";
         
-        const entityName = "Entity";
         const defaultLabels = {
-            "entity": entityName,
+            "entity": "Entity",
             "name": "Name",
             "icon": "Icon",
             "animation_duration": "Animation Duration"
