@@ -15,7 +15,6 @@ window.customCards.push({
   name: CARD_NAME,
   description: "A stylish switch card with animations",
   preview: true,
-  documentationURL: "" // Optional: Add your documentation URL
 });
 
 class BetterSwitchCard extends LitElement {
@@ -30,9 +29,8 @@ class BetterSwitchCard extends LitElement {
     return styles;
   }
 
-  // Remove the import here as we'll handle it differently
   static async getConfigElement() {
-    // We'll load the editor synchronously since it's already imported in the HTML
+    await import('./editor');
     return document.createElement("better-switch-card-editor");
   }
 
@@ -46,7 +44,8 @@ class BetterSwitchCard extends LitElement {
   }
 
   setConfig(config) {
-    if (!config.entity) {
+    // Allow empty entity in the editor, but validate when card is actually used
+    if (this.hass && !config.entity) {
       throw new Error("Please define an entity");
     }
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -70,6 +69,17 @@ class BetterSwitchCard extends LitElement {
   render() {
     if (!this.hass || !this.config) {
       return html``;
+    }
+
+    // If we're in the editor (no entity selected yet), show a placeholder
+    if (!this.config.entity) {
+      return html`
+        <ha-card>
+          <div class="card-content">
+            Please define an entity
+          </div>
+        </ha-card>
+      `;
     }
 
     const stateObj = this.hass.states[this.config.entity];
@@ -109,9 +119,6 @@ class BetterSwitchCard extends LitElement {
   }
 }
 
-// Make sure the editor is loaded before defining the card
-customElements.whenDefined('better-switch-card-editor').then(() => {
-  customElements.define('better-switch-card', BetterSwitchCard);
-});
+customElements.define('better-switch-card', BetterSwitchCard);
 
 export default BetterSwitchCard;
