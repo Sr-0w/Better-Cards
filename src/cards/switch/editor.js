@@ -2,27 +2,82 @@
 import { html, nothing } from 'lit';
 import { fireEvent } from 'custom-card-helpers';
 import { BaseElement } from './utils/base-element';
-import { SWITCH_SCHEMA } from './shared/config/schema';
-import { setupCustomLocalize, GENERIC_LABELS } from './utils/localize';
 import { DOMAINS } from './const';
+
+// Schema definition matching mushroom's pattern more closely
+const SCHEMA = [
+    { 
+        name: "entity", 
+        required: true,
+        selector: { 
+            entity: { 
+                domain: DOMAINS,
+            } 
+        } 
+    },
+    { 
+        name: "name", 
+        selector: { 
+            text: {} 
+        } 
+    },
+    {
+        type: "grid",
+        name: "",
+        schema: [
+            {
+                name: "icon",
+                selector: { icon: {} },
+                context: { icon_entity: "entity" },
+            }
+        ],
+    },
+    { 
+        name: "animation_duration", 
+        selector: { 
+            number: {
+                min: 100,
+                step: 100,
+                mode: "box",
+                unit_of_measurement: "ms"
+            } 
+        } 
+    }
+];
 
 export class BetterSwitchCardEditor extends BaseElement {
     static get properties() {
         return {
             ...super.properties,
             _config: { state: true },
+            _loaded: { state: true, type: Boolean }
         };
     }
 
-    async firstUpdated() {
+    constructor() {
+        super();
+        this._loaded = false;
+    }
+
+    async connectedCallback() {
+        super.connectedCallback();
         await this._loadComponents();
     }
 
     async _loadComponents() {
-        if (!customElements.get("ha-form")) {
-            await customElements.whenDefined("hui-action-editor");
-            const helpers = await window.loadCardHelpers();
-            if (helpers) await helpers.importMoreInfoControl("light");
+        try {
+            if (!customElements.get("ha-form")) {
+                const helpers = await window.loadCardHelpers();
+                if (helpers) {
+                    await helpers.importMoreInfoControl("light");
+                }
+            }
+            await customElements.whenDefined("ha-selector");
+            await customElements.whenDefined("ha-entity-selector");
+            this._loaded = true;
+            this.requestUpdate();
+        } catch (error) {
+            console.error("Failed to load components:", error);
         }
     }
 
@@ -30,31 +85,21 @@ export class BetterSwitchCardEditor extends BaseElement {
         this._config = { ...config };
     }
 
-    _computeLabel(schema) {
-        const customLocalize = setupCustomLocalize(this.hass);
-
-        if (GENERIC_LABELS.includes(schema.name)) {
-            return customLocalize(`editor.card.generic.${schema.name}`);
-        }
-        
-        return customLocalize(schema.name);
-    }
-
     _valueChanged(ev) {
         fireEvent(this, "config-changed", { config: ev.detail.value });
     }
 
     render() {
-        if (!this.hass || !this._config) {
-            return nothing;
+        if (!this.hass || !this._config || !this._loaded) {
+            return html`<div>Loading editor...</div>`;
         }
 
         return html`
             <ha-form
                 .hass=${this.hass}
                 .data=${this._config}
-                .schema=${SWITCH_SCHEMA}
-                .computeLabel=${this._computeLabel}
+                .schema=${SCHEMA}
+                .computeLabel=${(schema) => schema.name}
                 @value-changed=${this._valueChanged}
             ></ha-form>
         `;
