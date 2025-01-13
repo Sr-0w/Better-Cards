@@ -8,18 +8,28 @@ export class BetterSwitchCardEditor extends LitElement {
     return {
       hass: { type: Object },
       _config: { type: Object },
+      _loaded: { type: Boolean },
     };
+  }
+
+  constructor() {
+    super();
+    this._loaded = false;
   }
 
   setConfig(config) {
     this._config = { ...config };
   }
 
-  firstUpdated() {
-    // Ensure all custom elements are loaded
-    customElements.whenDefined('ha-entity-picker').then(() => {
-      this.requestUpdate();
-    });
+  async firstUpdated() {
+    // Wait for ha-entity-picker to be defined
+    try {
+      await customElements.whenDefined('ha-entity-picker');
+      this._loaded = true;
+      await this.updateComplete;
+    } catch (e) {
+      console.error("Error loading ha-entity-picker:", e);
+    }
   }
 
   get _entity() {
@@ -60,8 +70,8 @@ export class BetterSwitchCardEditor extends LitElement {
   }
 
   render() {
-    if (!this._config || !this.hass) {
-      return html``;
+    if (!this._config || !this.hass || !this._loaded) {
+      return html`<div>Loading editor...</div>`;
     }
 
     return html`
