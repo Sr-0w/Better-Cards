@@ -3,7 +3,7 @@
 A stylish light control card for Home Assistant with smooth animations and a modern design.
 
 [![HACS Default][hacs-shield]][hacs]
-[![GitHub Release][releases-shield]][releases]
+![GitHub Release](https://img.shields.io/github/v/release/Sr-0w/Better-Cards)
 [![License][license-shield]](LICENSE)
 
 ![Preview](preview.gif)
